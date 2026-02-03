@@ -1,0 +1,158 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>CSI Data Quality Analyzer – Dashboard</title>
+
+  <!-- Plotly (charts) -->
+  <script src="https://cdn.plot.ly/plotly-2.30.0.min.js"></script>
+
+  <!-- PapaParse (read CSV in browser) -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+
+  <style>
+    body { font-family: Arial, sans-serif; margin: 24px; line-height: 1.35; }
+    .grid { display: grid; gap: 16px; grid-template-columns: 1fr; }
+    @media (min-width: 900px) { .grid { grid-template-columns: 1.2fr 0.8fr; } }
+    .card { border: 1px solid #ddd; border-radius: 10px; padding: 16px; }
+    .muted { color: #555; }
+    table { width: 100%; border-collapse: collapse; font-size: 14px; }
+    th, td { border-bottom: 1px solid #eee; padding: 8px; text-align: left; }
+    img { max-width: 100%; border: 1px solid #eee; border-radius: 8px; }
+    code { background: #f6f6f6; padding: 2px 6px; border-radius: 6px; }
+  </style>
+</head>
+
+<body>
+  <h1>CSI Data Quality Analyzer – Dashboard</h1>
+  <p class="muted">
+    This page visualizes example outputs produced by the CSI Data Quality Analyzer.
+    Data shown here comes from aggregated CSV summaries (no raw GIS data is published).
+  </p>
+
+  <div class="grid">
+    <div class="card">
+      <h2>3D Readiness (UNITA_VOLUMETRICA)</h2>
+      <div id="chart3d" style="height:420px;"></div>
+      <p class="muted">
+        Source: <code>examples/summary_unita_volumetrica_sample.csv</code>
+      </p>
+    </div>
+
+    <div class="card">
+      <h2>Key numbers</h2>
+      <table id="kv"></table>
+      <p class="muted" id="meta"></p>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px;">
+    <h2>Maps (exported from QGIS)</h2>
+    <p class="muted">
+      Add screenshots/exports as PNGs to <code>docs/assets/</code> and they will appear here.
+    </p>
+    <div style="display:grid; gap:12px; grid-template-columns: 1fr; @media (min-width: 900px){grid-template-columns:1fr 1fr;}">
+      <div>
+        <h3>2D Map</h3>
+        <img src="assets/map_2d.png" alt="2D map (QGIS export)" />
+      </div>
+      <div>
+        <h3>3D View</h3>
+        <img src="assets/map_3d.png" alt="3D view (QGIS export)" />
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px;">
+    <h2>Layer overview (sample)</h2>
+    <div id="layerTable"></div>
+    <p class="muted">
+      Source: <code>examples/summary_layers_sample.csv</code>
+    </p>
+  </div>
+
+<script>
+  function loadCSV(path) {
+    return new Promise((resolve, reject) => {
+      Papa.parse(path, {
+        download: true,
+        header: true,
+        dynamicTyping: true,
+        skipEmptyLines: true,
+        complete: results => resolve(results.data),
+        error: err => reject(err)
+      });
+    });
+  }
+
+  function renderKV(row) {
+    const fields = [
+      ["Buildings (n_features)", row.n_features],
+      ["Height available (%)", row.pct_height_available],
+      ["QT_GRONDA zero/null (%)", row.pct_qt_gronda_zero_or_null],
+      ["QT_SUOLO zero/null (%)", row.pct_qt_suolo_zero_or_null],
+      ["ALTEZZA_VO null (%)", row.pct_altezza_null]
+    ];
+    const table = document.getElementById("kv");
+    table.innerHTML =
+      "<thead><tr><th>Metric</th><th>Value</th></tr></thead>" +
+      "<tbody>" +
+      fields.map(([k,v]) => `<tr><td>${k}</td><td>${v ?? "N/A"}</td></tr>`).join("") +
+      "</tbody>";
+  }
+
+  function render3DChart(row) {
+    const available = row.pct_height_available ?? 0;
+    const missing = 100 - available;
+
+    const data = [{
+      type: "bar",
+      x: ["Height available", "Missing/zero height"],
+      y: [available, missing],
+    }];
+
+    const layout = {
+      yaxis: { title: "Percent (%)", range: [0, 100] },
+      margin: { t: 20, l: 50, r: 20, b: 50 },
+    };
+
+    Plotly.newPlot("chart3d", data, layout, {displayModeBar: false});
+  }
+
+  function renderLayerTable(rows) {
+    // pick a few columns to keep it readable
+    const cols = ["layer_name", "n_features", "crs", "geom_types", "pct_missing_any", "top_missing_fields"];
+    const header = `<tr>${cols.map(c => `<th>${c}</th>`).join("")}</tr>`;
+    const body = rows.map(r =>
+      `<tr>${cols.map(c => `<td>${(r[c] ?? "")}</td>`).join("")}</tr>`
+    ).join("");
+
+    document.getElementById("layerTable").innerHTML =
+      `<table><thead>${header}</thead><tbody>${body}</tbody></table>`;
+  }
+
+  async function main() {
+    // 3D readiness
+    const uv = await loadCSV("../examples/summary_unita_volumetrica_sample.csv");
+    const row = uv[0];
+    renderKV(row);
+    render3DChart(row);
+
+    // layers (sample)
+    const layers = await loadCSV("../examples/summary_layers_sample.csv");
+    renderLayerTable(layers);
+
+    document.getElementById("meta").textContent =
+      `Layer: ${row.layer_name || "UNITA_VOLUMETRICA"} | Source: ${row.source || "CSI GeoPackage"}`;
+  }
+
+  main().catch(err => {
+    console.error(err);
+    document.body.insertAdjacentHTML("beforeend",
+      `<p style="color:red;">Failed to load CSV files. Make sure examples/*.csv exist and paths are correct.</p>`);
+  });
+</script>
+
+</body>
+</html>
