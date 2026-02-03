@@ -1,0 +1,2 @@
+source,layer_name,n_features,height_fields_present,height_fields_missing,pct_height_available,pct_qt_gronda_zero_or_null,pct_qt_suolo_zero_or_null,pct_altezza_null,note
+csi_data_sample_edificato_circoscrizione_7.gpkg,020101_UNITA_VOLUMETRICA,17565,"QT_GRONDA, QT_SUOLO, ALTEZZA_VO",,81.01,18.99,0.0,18.99,3D readiness treats 0 elevation values as missing.
