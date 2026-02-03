@@ -134,13 +134,13 @@
 
   async function main() {
     // 3D readiness
-    const uv = await loadCSV("examples/summary_unita_volumetrica_sample.csv");
+    const uv = await loadCSV("examples/summary_unita_volumetrica.csv");
     const row = uv[0];
     renderKV(row);
     render3DChart(row);
 
     // layers (sample)
-    const layers = await loadCSV("examples/summary_layers_sample.csv");
+    const layers = await loadCSV("examples/summary_layers.csv");
     renderLayerTable(layers);
 
     document.getElementById("meta").textContent =
