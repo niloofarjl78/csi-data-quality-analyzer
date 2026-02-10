@@ -77,6 +77,28 @@
     </p>
   </div>
 
+  <section id="height-map">
+  <h2>Interactive Height Availability Map (Circoscrizione 7)</h2>
+  <p>
+    This map shows, for each volumetric unit, whether the dataset contains
+    usable height information (<code>OK</code>) or is missing critical
+    vertical attributes (<code>MISSING</code>). The visualization is based
+    on the <code>has_height</code> field derived from QT_GRONDA and QT_SUOLO.
+  </p>
+
+  <p>
+    <a href="interactive/c7_height_map/index.html" target="_blank">
+      Open map in a separate tab
+    </a>
+  </p>
+
+  <iframe
+      src="interactive/c7_height_map/index.html"
+      title="Height availability map – Circoscrizione 7"
+      style="width: 100%; max-width: 1100px; height: 600px; border: 1px solid #ccc; border-radius: 4px;">
+  </iframe>
+</section>
+
 <script>
   function loadCSV(path) {
     return new Promise((resolve, reject) => {
