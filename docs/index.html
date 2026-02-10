@@ -65,8 +65,7 @@
       }
     }
 
-    .card,
-    section.card {
+    .card {
       background: #ffffff;
       border-radius: 12px;
       padding: 20px 24px;
@@ -131,6 +130,42 @@
       box-shadow: 0 1px 3px rgba(15,23,42,0.06);
     }
 
+    /* ====== TABS ====== */
+    .tabs {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+      border-bottom: 1px solid #e5e7eb;
+      flex-wrap: wrap;
+    }
+
+    .tab-button {
+      padding: 0.5rem 0.9rem;
+      border-radius: 999px 999px 0 0;
+      border: 1px solid transparent;
+      border-bottom: none;
+      background: transparent;
+      cursor: pointer;
+      font-size: 0.9rem;
+      color: #4b5563;
+    }
+
+    .tab-button.active {
+      background: #ffffff;
+      border-color: #e5e7eb;
+      border-bottom-color: #ffffff;
+      color: #111827;
+      font-weight: 600;
+    }
+
+    .tab-panel {
+      display: none;
+    }
+
+    .tab-panel.active {
+      display: block;
+    }
   </style>
 </head>
 
@@ -145,134 +180,148 @@
       <p class="muted">
         Data source: CSI sample (Circoscrizione 7) – aggregated outputs only.
       </p>
+
+      <!-- Tabs -->
+      <nav class="tabs">
+        <button class="tab-button active" data-tab="overview">Overview</button>
+        <button class="tab-button" data-tab="maps">Maps (2D / 3D)</button>
+        <button class="tab-button" data-tab="interactive">Interactive Map</button>
+        <button class="tab-button" data-tab="fiware">CSI vs FIWARE</button>
+      </nav>
     </header>
 
-    <!-- ====== 3D READINESS + KEY NUMBERS ====== -->
-    <div class="grid">
+    <!-- ====== OVERVIEW TAB ====== -->
+    <section class="tab-panel active" data-tab-panel="overview">
+      <div class="grid">
+        <div class="card">
+          <h2>3D Readiness (UNITA_VOLUMETRICA)</h2>
+          <div id="chart3d" style="height:420px;"></div>
+          <p class="muted">
+            Source: <code>examples/summary_unita_volumetrica_sample.csv</code>
+          </p>
+        </div>
+
+        <div class="card">
+          <h2>Key numbers</h2>
+          <table id="kv"></table>
+          <p class="muted" id="meta"></p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ====== MAPS TAB ====== -->
+    <section class="tab-panel" data-tab-panel="maps">
       <div class="card">
-        <h2>3D Readiness (UNITA_VOLUMETRICA)</h2>
-        <div id="chart3d" style="height:420px;"></div>
+        <h2>Maps (exported from QGIS)</h2>
         <p class="muted">
-          Source: <code>examples/summary_unita_volumetrica_sample.csv</code>
+          These static views show the CSI sample for Circoscrizione 7. Screenshots are exported
+          from QGIS and stored in <code>docs/assets/</code>.
+        </p>
+
+        <div class="map-grid">
+          <div>
+            <h3>2D Map</h3>
+            <img src="assets/map_2d.png" alt="2D map (QGIS export)" />
+          </div>
+          <div>
+            <h3>3D View</h3>
+            <img src="assets/map_3d.png" alt="3D view (QGIS export)" />
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <h2>Layer overview (sample)</h2>
+        <div id="layerTable"></div>
+        <p class="muted">
+          Source: <code>examples/summary_layers_sample.csv</code>
         </p>
       </div>
-
-      <div class="card">
-        <h2>Key numbers</h2>
-        <table id="kv"></table>
-        <p class="muted" id="meta"></p>
-      </div>
-    </div>
-
-    <!-- ====== 2D / 3D MAP IMAGES ====== -->
-    <div class="card">
-      <h2>Maps (exported from QGIS)</h2>
-      <p class="muted">
-        These static views show the CSI sample for Circoscrizione 7. Screenshots are exported
-        from QGIS and stored in <code>docs/assets/</code>.
-      </p>
-
-      <div class="map-grid">
-        <div>
-          <h3>2D Map</h3>
-          <img src="assets/map_2d.png" alt="2D map (QGIS export)" />
-        </div>
-        <div>
-          <h3>3D View</h3>
-          <img src="assets/map_3d.png" alt="3D view (QGIS export)" />
-        </div>
-      </div>
-    </div>
-
-    <!-- ====== LAYER OVERVIEW TABLE ====== -->
-    <div class="card">
-      <h2>Layer overview (sample)</h2>
-      <div id="layerTable"></div>
-      <p class="muted">
-        Source: <code>examples/summary_layers_sample.csv</code>
-      </p>
-    </div>
-
-    <!-- ====== INTERACTIVE HEIGHT MAP ====== -->
-    <section class="card" id="height-map">
-      <h2>Interactive Height Availability Map (Circoscrizione 7)</h2>
-      <p class="note">
-        This map shows, for each volumetric unit, whether the dataset contains usable height
-        information (<code>OK</code>) or is missing critical vertical attributes
-        (<code>MISSING</code>). The visualization is based on the
-        <code>has_height</code> field derived from <code>QT_GRONDA</code> and
-        <code>QT_SUOLO</code>.
-      </p>
-
-      <p class="note">
-        If the embedded map is too small, you can open it in a separate tab:
-        <a href="interactive/c7_height_map/index.html" target="_blank">
-          Open map in a separate tab
-        </a>
-      </p>
-
-      <iframe
-        class="map-frame"
-        src="interactive/c7_height_map/index.html"
-        title="Height availability map – Circoscrizione 7">
-      </iframe>
     </section>
 
-    <!-- ====== FIWARE COMPARISON ====== -->
-    <section class="card" id="fiware-comparison">
-      <h2>CSI Dataset vs FIWARE Building Model</h2>
-      <p class="note">
-        This table compares key attributes in the CSI dataset with the FIWARE Building
-        data model. It highlights where a direct mapping is possible and where additional
-        transformation or enrichment would be needed to achieve interoperability.
-      </p>
+    <!-- ====== INTERACTIVE MAP TAB ====== -->
+    <section class="tab-panel" data-tab-panel="interactive">
+      <div class="card" id="height-map">
+        <h2>Interactive Height Availability Map (Circoscrizione 7)</h2>
+        <p class="note">
+          This map shows, for each volumetric unit, whether the dataset contains usable height
+          information (<code>OK</code>) or is missing critical vertical attributes
+          (<code>MISSING</code>). The visualization is based on the
+          <code>has_height</code> field derived from <code>QT_GRONDA</code> and
+          <code>QT_SUOLO</code>.
+        </p>
 
-      <table>
-        <thead>
-          <tr>
-            <th>Concept</th>
-            <th>CSI (Edificato)</th>
-            <th>FIWARE Building model</th>
-            <th>Mapping / Gap</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>Unique identifier</td>
-            <td><code>ID</code> (local building identifier)</td>
-            <td><code>id</code> (URN, e.g. <code>urn:ngsi-ld:Building:001</code>)</td>
-            <td>Requires conversion from local numeric ID to FIWARE URN syntax.</td>
-          </tr>
-          <tr>
-            <td>Geometry (footprint / volume)</td>
-            <td><code>UNITA_VOLUMETRICA</code> polygon</td>
-            <td><code>location</code> (GeoJSON Polygon / MultiPolygon)</td>
-            <td>Direct mapping possible after export of CSI geometries to GeoJSON.</td>
-          </tr>
-          <tr>
-            <td>Building height</td>
-            <td><code>QT_GRONDA</code>, <code>QT_SUOLO</code>,
-                derived <code>ALTEZZA</code> (sometimes NULL)</td>
-            <td><code>height</code> attribute</td>
-            <td>Mapping possible where values exist; NULLs require estimation or
-                remain explicitly missing.</td>
-          </tr>
-          <tr>
-            <td>Number of floors</td>
-            <td><code>NUM_PIANI</code></td>
-            <td><code>numberOfFloors</code></td>
-            <td>Direct mapping where <code>NUM_PIANI</code> is populated.</td>
-          </tr>
-          <tr>
-            <td>Use / function</td>
-            <td><code>CATEG_USO</code> (residential, service, etc.)</td>
-            <td><code>category</code> / <code>usage</code></td>
-            <td>Requires alignment between CSI codes and FIWARE category vocabulary.</td>
-          </tr>
-        </tbody>
-      </table>
+        <p class="note">
+          If the embedded map is too small, you can open it in a separate tab:
+          <a href="interactive/c7_height_map/index.html" target="_blank">
+            Open map in a separate tab
+          </a>
+        </p>
+
+        <iframe
+          class="map-frame"
+          src="interactive/c7_height_map/index.html"
+          title="Height availability map – Circoscrizione 7">
+        </iframe>
+      </div>
     </section>
 
+    <!-- ====== FIWARE TAB ====== -->
+    <section class="tab-panel" data-tab-panel="fiware">
+      <div class="card" id="fiware-comparison">
+        <h2>CSI Dataset vs FIWARE Building Model</h2>
+        <p class="note">
+          This table compares key attributes in the CSI dataset with the FIWARE Building
+          data model. It highlights where a direct mapping is possible and where additional
+          transformation or enrichment would be needed to achieve interoperability.
+        </p>
+
+        <table>
+          <thead>
+            <tr>
+              <th>Concept</th>
+              <th>CSI (Edificato)</th>
+              <th>FIWARE Building model</th>
+              <th>Mapping / Gap</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Unique identifier</td>
+              <td><code>ID</code> (local building identifier)</td>
+              <td><code>id</code> (URN, e.g. <code>urn:ngsi-ld:Building:001</code>)</td>
+              <td>Requires conversion from local numeric ID to FIWARE URN syntax.</td>
+            </tr>
+            <tr>
+              <td>Geometry (footprint / volume)</td>
+              <td><code>UNITA_VOLUMETRICA</code> polygon</td>
+              <td><code>location</code> (GeoJSON Polygon / MultiPolygon)</td>
+              <td>Direct mapping possible after export of CSI geometries to GeoJSON.</td>
+            </tr>
+            <tr>
+              <td>Building height</td>
+              <td><code>QT_GRONDA</code>, <code>QT_SUOLO</code>,
+                  derived <code>ALTEZZA</code> (sometimes NULL)</td>
+              <td><code>height</code> attribute</td>
+              <td>Mapping possible where values exist; NULLs require estimation or
+                  remain explicitly missing.</td>
+            </tr>
+            <tr>
+              <td>Number of floors</td>
+              <td><code>NUM_PIANI</code></td>
+              <td><code>numberOfFloors</code></td>
+              <td>Direct mapping where <code>NUM_PIANI</code> is populated.</td>
+            </tr>
+            <tr>
+              <td>Use / function</td>
+              <td><code>CATEG_USO</code> (residential, service, etc.)</td>
+              <td><code>category</code> / <code>usage</code></td>
+              <td>Requires alignment between CSI codes and FIWARE category vocabulary.</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
   </main>
 
   <!-- ====== JAVASCRIPT: LOAD CSVs & DRAW CHARTS ====== -->
@@ -355,6 +404,29 @@
       console.error(err);
       document.body.insertAdjacentHTML("beforeend",
         `<p style="color:red;">Failed to load CSV files. Make sure examples/*.csv exist and paths are correct.</p>`);
+    });
+  </script>
+
+  <!-- ====== TABS SCRIPT ====== -->
+  <script>
+    const tabButtons = document.querySelectorAll(".tab-button");
+    const tabPanels  = document.querySelectorAll(".tab-panel");
+
+    tabButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const target = btn.getAttribute("data-tab");
+
+        // update buttons
+        tabButtons.forEach(b => b.classList.toggle("active", b === btn));
+
+        // show / hide panels
+        tabPanels.forEach(panel => {
+          panel.classList.toggle(
+            "active",
+            panel.getAttribute("data-tab-panel") === target
+          );
+        });
+      });
     });
   </script>
 </body>
