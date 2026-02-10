@@ -12,262 +12,350 @@
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
 
   <style>
-    body { font-family: Arial, sans-serif; margin: 24px; line-height: 1.35; }
-    .grid { display: grid; gap: 16px; grid-template-columns: 1fr; }
-    @media (min-width: 900px) { .grid { grid-template-columns: 1.2fr 0.8fr; } }
-    .card { border: 1px solid #ddd; border-radius: 10px; padding: 16px; }
-    .muted { color: #555; }
-    table { width: 100%; border-collapse: collapse; font-size: 14px; }
-    th, td { border-bottom: 1px solid #eee; padding: 8px; text-align: left; }
-    img { max-width: 100%; border: 1px solid #eee; border-radius: 8px; }
-    code { background: #f6f6f6; padding: 2px 6px; border-radius: 6px; }
+    /* ====== GLOBAL LAYOUT ====== */
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background-color: #f3f4f6;
+      color: #111827;
+      margin: 0;
+    }
+
+    .page {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 24px 16px 40px;
+    }
+
+    h1, h2, h3 {
+      font-weight: 600;
+      color: #0f172a;
+      margin-top: 0;
+    }
+
+    p {
+      margin: 0.3rem 0 0.6rem;
+    }
+
+    a {
+      color: #0f766e;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+
+    .muted,
+    .note {
+      font-size: 0.9rem;
+      color: #4b5563;
+    }
+
+    /* ====== CARDS & GRID ====== */
+    .grid {
+      display: grid;
+      gap: 20px;
+      grid-template-columns: 1fr;
+      margin-top: 1.5rem;
+    }
+
+    @media (min-width: 1024px) {
+      .grid {
+        grid-template-columns: minmax(0,1.2fr) minmax(0,0.8fr);
+      }
+    }
+
+    .card,
+    section.card {
+      background: #ffffff;
+      border-radius: 12px;
+      padding: 20px 24px;
+      border: 1px solid #e5e7eb;
+      box-shadow: 0 1px 3px rgba(15,23,42,0.06);
+      margin-top: 1.25rem;
+    }
+
+    /* ====== TABLES ====== */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+    }
+
+    th, td {
+      padding: 8px 10px;
+      text-align: left;
+      border-bottom: 1px solid #e5e7eb;
+      vertical-align: top;
+    }
+
+    thead th {
+      background-color: #f9fafb;
+      font-weight: 600;
+    }
+
+    code {
+      background: #f3f4f6;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 0.85rem;
+    }
+
+    /* ====== IMAGES (2D / 3D MAPS) ====== */
+    img {
+      max-width: 100%;
+      border-radius: 8px;
+      border: 1px solid #d1d5db;
+      display: block;
+    }
+
+    .map-grid {
+      display: grid;
+      gap: 12px;
+      grid-template-columns: 1fr;
+    }
+
+    @media (min-width: 900px) {
+      .map-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    /* ====== IFRAME MAP ====== */
+    .map-frame {
+      width: 100%;
+      max-width: 1100px;
+      height: 600px;
+      border: 1px solid #d1d5db;
+      border-radius: 8px;
+      box-shadow: 0 1px 3px rgba(15,23,42,0.06);
+    }
+
   </style>
-  <style>
-  body {
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-    background-color: #f8fafc;
-    color: #111827;
-    margin: 0;
-    padding: 1.5rem 2rem;
-  }
-
-  h1, h2, h3 {
-    font-weight: 600;
-    color: #0f172a;
-  }
-
-  a {
-    color: #0f766e;
-    text-decoration: none;
-  }
-
-  a:hover {
-    text-decoration: underline;
-  }
-
-  section {
-    margin-bottom: 2.5rem;
-    max-width: 1100px;
-  }
-
-  .note {
-    font-size: 0.9rem;
-    color: #4b5563;
-  }
-</style>
-
 </head>
 
 <body>
-  <h1>CSI Data Quality Analyzer – Dashboard</h1>
-  <p class="muted">
-    This page visualizes example outputs produced by the CSI Data Quality Analyzer.
-    Data shown here comes from aggregated CSV summaries (no raw GIS data is published).
-  </p>
-
-  <p class="muted">
-  Data source: CSI sample (Circoscrizione 7) – aggregated outputs only (no raw GIS data).
-  </p>
-
-
-  <div class="grid">
-    <div class="card">
-      <h2>3D Readiness (UNITA_VOLUMETRICA)</h2>
-      <div id="chart3d" style="height:420px;"></div>
+  <main class="page">
+    <header>
+      <h1>CSI Data Quality Analyzer – Dashboard</h1>
       <p class="muted">
-        Source: <code>examples/summary_unita_volumetrica_sample.csv</code>
+        This dashboard summarizes the analysis of the CSI building dataset in Circoscrizione 7.
+        All values are computed from aggregated CSV outputs (no raw GIS data is published).
+      </p>
+      <p class="muted">
+        Data source: CSI sample (Circoscrizione 7) – aggregated outputs only.
+      </p>
+    </header>
+
+    <!-- ====== 3D READINESS + KEY NUMBERS ====== -->
+    <div class="grid">
+      <div class="card">
+        <h2>3D Readiness (UNITA_VOLUMETRICA)</h2>
+        <div id="chart3d" style="height:420px;"></div>
+        <p class="muted">
+          Source: <code>examples/summary_unita_volumetrica_sample.csv</code>
+        </p>
+      </div>
+
+      <div class="card">
+        <h2>Key numbers</h2>
+        <table id="kv"></table>
+        <p class="muted" id="meta"></p>
+      </div>
+    </div>
+
+    <!-- ====== 2D / 3D MAP IMAGES ====== -->
+    <div class="card">
+      <h2>Maps (exported from QGIS)</h2>
+      <p class="muted">
+        These static views show the CSI sample for Circoscrizione 7. Screenshots are exported
+        from QGIS and stored in <code>docs/assets/</code>.
+      </p>
+
+      <div class="map-grid">
+        <div>
+          <h3>2D Map</h3>
+          <img src="assets/map_2d.png" alt="2D map (QGIS export)" />
+        </div>
+        <div>
+          <h3>3D View</h3>
+          <img src="assets/map_3d.png" alt="3D view (QGIS export)" />
+        </div>
+      </div>
+    </div>
+
+    <!-- ====== LAYER OVERVIEW TABLE ====== -->
+    <div class="card">
+      <h2>Layer overview (sample)</h2>
+      <div id="layerTable"></div>
+      <p class="muted">
+        Source: <code>examples/summary_layers_sample.csv</code>
       </p>
     </div>
 
-    <div class="card">
-      <h2>Key numbers</h2>
-      <table id="kv"></table>
-      <p class="muted" id="meta"></p>
-    </div>
-  </div>
+    <!-- ====== INTERACTIVE HEIGHT MAP ====== -->
+    <section class="card" id="height-map">
+      <h2>Interactive Height Availability Map (Circoscrizione 7)</h2>
+      <p class="note">
+        This map shows, for each volumetric unit, whether the dataset contains usable height
+        information (<code>OK</code>) or is missing critical vertical attributes
+        (<code>MISSING</code>). The visualization is based on the
+        <code>has_height</code> field derived from <code>QT_GRONDA</code> and
+        <code>QT_SUOLO</code>.
+      </p>
 
-  <div class="card" style="margin-top:16px;">
-    <h2>Maps (exported from QGIS)</h2>
-    <p class="muted">
-      Add screenshots/exports as PNGs to <code>docs/assets/</code> and they will appear here.
-    </p>
-    <div style="display:grid; gap:12px; grid-template-columns: 1fr; @media (min-width: 900px){grid-template-columns:1fr 1fr;}">
-      <div>
-        <h3>2D Map</h3>
-        <img src="assets/map_2d.png" alt="2D map (QGIS export)" />
-      </div>
-      <div>
-        <h3>3D View</h3>
-        <img src="assets/map_3d.png" alt="3D view (QGIS export)" />
-      </div>
-    </div>
-  </div>
+      <p class="note">
+        If the embedded map is too small, you can open it in a separate tab:
+        <a href="interactive/c7_height_map/index.html" target="_blank">
+          Open map in a separate tab
+        </a>
+      </p>
 
-  <div class="card" style="margin-top:16px;">
-    <h2>Layer overview (sample)</h2>
-    <div id="layerTable"></div>
-    <p class="muted">
-      Source: <code>examples/summary_layers_sample.csv</code>
-    </p>
-  </div>
+      <iframe
+        class="map-frame"
+        src="interactive/c7_height_map/index.html"
+        title="Height availability map – Circoscrizione 7">
+      </iframe>
+    </section>
 
-  <section id="height-map">
-  <h2>Interactive Height Availability Map (Circoscrizione 7)</h2>
-  <p>
-    This map shows, for each volumetric unit, whether the dataset contains
-    usable height information (<code>OK</code>) or is missing critical
-    vertical attributes (<code>MISSING</code>). The visualization is based
-    on the <code>has_height</code> field derived from QT_GRONDA and QT_SUOLO.
-  </p>
+    <!-- ====== FIWARE COMPARISON ====== -->
+    <section class="card" id="fiware-comparison">
+      <h2>CSI Dataset vs FIWARE Building Model</h2>
+      <p class="note">
+        This table compares key attributes in the CSI dataset with the FIWARE Building
+        data model. It highlights where a direct mapping is possible and where additional
+        transformation or enrichment would be needed to achieve interoperability.
+      </p>
 
-  <p>
-    <a href="interactive/c7_height_map/index.html" target="_blank">
-      Open map in a separate tab
-    </a>
-  </p>
+      <table>
+        <thead>
+          <tr>
+            <th>Concept</th>
+            <th>CSI (Edificato)</th>
+            <th>FIWARE Building model</th>
+            <th>Mapping / Gap</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Unique identifier</td>
+            <td><code>ID</code> (local building identifier)</td>
+            <td><code>id</code> (URN, e.g. <code>urn:ngsi-ld:Building:001</code>)</td>
+            <td>Requires conversion from local numeric ID to FIWARE URN syntax.</td>
+          </tr>
+          <tr>
+            <td>Geometry (footprint / volume)</td>
+            <td><code>UNITA_VOLUMETRICA</code> polygon</td>
+            <td><code>location</code> (GeoJSON Polygon / MultiPolygon)</td>
+            <td>Direct mapping possible after export of CSI geometries to GeoJSON.</td>
+          </tr>
+          <tr>
+            <td>Building height</td>
+            <td><code>QT_GRONDA</code>, <code>QT_SUOLO</code>,
+                derived <code>ALTEZZA</code> (sometimes NULL)</td>
+            <td><code>height</code> attribute</td>
+            <td>Mapping possible where values exist; NULLs require estimation or
+                remain explicitly missing.</td>
+          </tr>
+          <tr>
+            <td>Number of floors</td>
+            <td><code>NUM_PIANI</code></td>
+            <td><code>numberOfFloors</code></td>
+            <td>Direct mapping where <code>NUM_PIANI</code> is populated.</td>
+          </tr>
+          <tr>
+            <td>Use / function</td>
+            <td><code>CATEG_USO</code> (residential, service, etc.)</td>
+            <td><code>category</code> / <code>usage</code></td>
+            <td>Requires alignment between CSI codes and FIWARE category vocabulary.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
 
-  <iframe
-      src="interactive/c7_height_map/index.html"
-      title="Height availability map – Circoscrizione 7"
-      style="width: 100%; max-width: 1100px; height: 600px; border: 1px solid #ccc; border-radius: 4px;">
-  </iframe>
-</section>
+  </main>
 
-<script>
-  function loadCSV(path) {
-    return new Promise((resolve, reject) => {
-      Papa.parse(path, {
-        download: true,
-        header: true,
-        dynamicTyping: true,
-        skipEmptyLines: true,
-        complete: results => resolve(results.data),
-        error: err => reject(err)
+  <!-- ====== JAVASCRIPT: LOAD CSVs & DRAW CHARTS ====== -->
+  <script>
+    function loadCSV(path) {
+      return new Promise((resolve, reject) => {
+        Papa.parse(path, {
+          download: true,
+          header: true,
+          dynamicTyping: true,
+          skipEmptyLines: true,
+          complete: results => resolve(results.data),
+          error: err => reject(err)
+        });
       });
+    }
+
+    function renderKV(row) {
+      const fields = [
+        ["Buildings (n_features)", row.n_features],
+        ["Height available (%)", row.pct_height_available],
+        ["QT_GRONDA zero/null (%)", row.pct_qt_gronda_zero_or_null],
+        ["QT_SUOLO zero/null (%)", row.pct_qt_suolo_zero_or_null],
+        ["ALTEZZA_VO null (%)", row.pct_altezza_null]
+      ];
+      const table = document.getElementById("kv");
+      table.innerHTML =
+        "<thead><tr><th>Metric</th><th>Value</th></tr></thead>" +
+        "<tbody>" +
+        fields.map(([k,v]) => `<tr><td>${k}</td><td>${v ?? "N/A"}</td></tr>`).join("") +
+        "</tbody>";
+    }
+
+    function render3DChart(row) {
+      const available = row.pct_height_available ?? 0;
+      const missing = 100 - available;
+
+      const data = [{
+        type: "bar",
+        x: ["Height available", "Missing/zero height"],
+        y: [available, missing],
+        marker: { color: ["#2563eb", "#f97316"] }
+      }];
+
+      const layout = {
+        yaxis: { title: "Percent (%)", range: [0, 100] },
+        margin: { t: 20, l: 50, r: 20, b: 50 }
+      };
+
+      Plotly.newPlot("chart3d", data, layout, {displayModeBar: false});
+    }
+
+    function renderLayerTable(rows) {
+      const cols = ["layer_name", "n_features", "crs", "geom_types", "pct_missing_any", "top_missing_fields"];
+      const header = `<tr>${cols.map(c => `<th>${c}</th>`).join("")}</tr>`;
+      const body = rows.map(r =>
+        `<tr>${cols.map(c => `<td>${(r[c] ?? "")}</td>`).join("")}</tr>`
+      ).join("");
+
+      document.getElementById("layerTable").innerHTML =
+        `<table><thead>${header}</thead><tbody>${body}</tbody></table>`;
+    }
+
+    async function main() {
+      // 3D readiness
+      const uv = await loadCSV("examples/summary_unita_volumetrica.csv");
+      const row = uv[0];
+      renderKV(row);
+      render3DChart(row);
+
+      // layers
+      const layers = await loadCSV("examples/summary_layers.csv");
+      renderLayerTable(layers);
+
+      document.getElementById("meta").textContent =
+        `Layer: ${row.layer_name || "UNITA_VOLUMETRICA"} | Source: ${row.source || "CSI GeoPackage"}`;
+    }
+
+    main().catch(err => {
+      console.error(err);
+      document.body.insertAdjacentHTML("beforeend",
+        `<p style="color:red;">Failed to load CSV files. Make sure examples/*.csv exist and paths are correct.</p>`);
     });
-  }
-
-  function renderKV(row) {
-    const fields = [
-      ["Buildings (n_features)", row.n_features],
-      ["Height available (%)", row.pct_height_available],
-      ["QT_GRONDA zero/null (%)", row.pct_qt_gronda_zero_or_null],
-      ["QT_SUOLO zero/null (%)", row.pct_qt_suolo_zero_or_null],
-      ["ALTEZZA_VO null (%)", row.pct_altezza_null]
-    ];
-    const table = document.getElementById("kv");
-    table.innerHTML =
-      "<thead><tr><th>Metric</th><th>Value</th></tr></thead>" +
-      "<tbody>" +
-      fields.map(([k,v]) => `<tr><td>${k}</td><td>${v ?? "N/A"}</td></tr>`).join("") +
-      "</tbody>";
-  }
-
-  function render3DChart(row) {
-    const available = row.pct_height_available ?? 0;
-    const missing = 100 - available;
-
-    const data = [{
-      type: "bar",
-      x: ["Height available", "Missing/zero height"],
-      y: [available, missing],
-    }];
-
-    const layout = {
-      yaxis: { title: "Percent (%)", range: [0, 100] },
-      margin: { t: 20, l: 50, r: 20, b: 50 },
-    };
-
-    Plotly.newPlot("chart3d", data, layout, {displayModeBar: false});
-  }
-
-  function renderLayerTable(rows) {
-    // pick a few columns to keep it readable
-    const cols = ["layer_name", "n_features", "crs", "geom_types", "pct_missing_any", "top_missing_fields"];
-    const header = `<tr>${cols.map(c => `<th>${c}</th>`).join("")}</tr>`;
-    const body = rows.map(r =>
-      `<tr>${cols.map(c => `<td>${(r[c] ?? "")}</td>`).join("")}</tr>`
-    ).join("");
-
-    document.getElementById("layerTable").innerHTML =
-      `<table><thead>${header}</thead><tbody>${body}</tbody></table>`;
-  }
-
-  async function main() {
-    // 3D readiness
-    const uv = await loadCSV("examples/summary_unita_volumetrica.csv");
-    const row = uv[0];
-    renderKV(row);
-    render3DChart(row);
-
-    // layers (sample)
-    const layers = await loadCSV("examples/summary_layers.csv");
-    renderLayerTable(layers);
-
-    document.getElementById("meta").textContent =
-      `Layer: ${row.layer_name || "UNITA_VOLUMETRICA"} | Source: ${row.source || "CSI GeoPackage"}`;
-  }
-
-  main().catch(err => {
-    console.error(err);
-    document.body.insertAdjacentHTML("beforeend",
-      `<p style="color:red;">Failed to load CSV files. Make sure examples/*.csv exist and paths are correct.</p>`);
-  });
-</script>
-<section id="fiware-comparison">
-  <h2>CSI Dataset vs FIWARE Building Model</h2>
-  <p class="note">
-    This table compares the main building attributes in the CSI dataset
-    with the corresponding concepts in the FIWARE Building data model.
-    It highlights which CSI fields can be mapped directly and where
-    additional enrichment would be required for full interoperability.
-  </p>
-
-  <table border="1" cellpadding="6" cellspacing="0" style="border-collapse: collapse;">
-    <thead>
-      <tr>
-        <th>Concept</th>
-        <th>CSI (Edificato)</th>
-        <th>FIWARE Building model</th>
-        <th>Mapping / Gap</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td>Unique identifier</td>
-        <td><code>ID</code> (or local building ID)</td>
-        <td><code>id</code> (URN, e.g. <code>urn:ngsi-ld:Building:001</code>)</td>
-        <td>Requires conversion from local numeric ID to FIWARE URN format.</td>
-      </tr>
-      <tr>
-        <td>Geometry (footprint / volume)</td>
-        <td><code>UNITA_VOLUMETRICA</code> polygon</td>
-        <td><code>location</code> (GeoJSON Polygon / MultiPolygon)</td>
-        <td>Direct mapping possible after export to GeoJSON.</td>
-      </tr>
-      <tr>
-        <td>Building height</td>
-        <td><code>QT_GRONDA</code>, <code>QT_SUOLO</code>, derived <code>ALTEZZA</code> (sometimes NULL)</td>
-        <td><code>height</code> attribute</td>
-        <td>Mapping possible where values are present; NULLs require estimation or remain missing.</td>
-      </tr>
-      <tr>
-        <td>Number of floors</td>
-        <td><code>NUM_PIANI</code></td>
-        <td><code>numberOfFloors</code></td>
-        <td>Direct mapping where provided.</td>
-      </tr>
-      <tr>
-        <td>Use / function</td>
-        <td><code>CATEG_USO</code> (residential, service, etc.)</td>
-        <td><code>category</code> / <code>usage</code></td>
-        <td>Requires code list alignment between CSI categories and FIWARE vocabulary.</td>
-      </tr>
-    </tbody>
-  </table>
-</section>
-
-
+  </script>
 </body>
 </html>
-
