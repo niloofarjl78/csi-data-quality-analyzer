@@ -22,6 +22,40 @@
     img { max-width: 100%; border: 1px solid #eee; border-radius: 8px; }
     code { background: #f6f6f6; padding: 2px 6px; border-radius: 6px; }
   </style>
+  <style>
+  body {
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    background-color: #f8fafc;
+    color: #111827;
+    margin: 0;
+    padding: 1.5rem 2rem;
+  }
+
+  h1, h2, h3 {
+    font-weight: 600;
+    color: #0f172a;
+  }
+
+  a {
+    color: #0f766e;
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+
+  section {
+    margin-bottom: 2.5rem;
+    max-width: 1100px;
+  }
+
+  .note {
+    font-size: 0.9rem;
+    color: #4b5563;
+  }
+</style>
+
 </head>
 
 <body>
@@ -180,6 +214,59 @@
       `<p style="color:red;">Failed to load CSV files. Make sure examples/*.csv exist and paths are correct.</p>`);
   });
 </script>
+<section id="fiware-comparison">
+  <h2>CSI Dataset vs FIWARE Building Model</h2>
+  <p class="note">
+    This table compares the main building attributes in the CSI dataset
+    with the corresponding concepts in the FIWARE Building data model.
+    It highlights which CSI fields can be mapped directly and where
+    additional enrichment would be required for full interoperability.
+  </p>
+
+  <table border="1" cellpadding="6" cellspacing="0" style="border-collapse: collapse;">
+    <thead>
+      <tr>
+        <th>Concept</th>
+        <th>CSI (Edificato)</th>
+        <th>FIWARE Building model</th>
+        <th>Mapping / Gap</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Unique identifier</td>
+        <td><code>ID</code> (or local building ID)</td>
+        <td><code>id</code> (URN, e.g. <code>urn:ngsi-ld:Building:001</code>)</td>
+        <td>Requires conversion from local numeric ID to FIWARE URN format.</td>
+      </tr>
+      <tr>
+        <td>Geometry (footprint / volume)</td>
+        <td><code>UNITA_VOLUMETRICA</code> polygon</td>
+        <td><code>location</code> (GeoJSON Polygon / MultiPolygon)</td>
+        <td>Direct mapping possible after export to GeoJSON.</td>
+      </tr>
+      <tr>
+        <td>Building height</td>
+        <td><code>QT_GRONDA</code>, <code>QT_SUOLO</code>, derived <code>ALTEZZA</code> (sometimes NULL)</td>
+        <td><code>height</code> attribute</td>
+        <td>Mapping possible where values are present; NULLs require estimation or remain missing.</td>
+      </tr>
+      <tr>
+        <td>Number of floors</td>
+        <td><code>NUM_PIANI</code></td>
+        <td><code>numberOfFloors</code></td>
+        <td>Direct mapping where provided.</td>
+      </tr>
+      <tr>
+        <td>Use / function</td>
+        <td><code>CATEG_USO</code> (residential, service, etc.)</td>
+        <td><code>category</code> / <code>usage</code></td>
+        <td>Requires code list alignment between CSI categories and FIWARE vocabulary.</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
 
 </body>
 </html>
