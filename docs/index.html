@@ -185,7 +185,8 @@
       <nav class="tabs">
         <button class="tab-button active" data-tab="overview">Overview</button>
         <button class="tab-button" data-tab="maps">Maps (2D / 3D)</button>
-        <button class="tab-button" data-tab="interactive">Interactive Map</button>
+        <button class="tab-button" data-tab="interactive">Interactive 2D Map</button>
+        <button class="tab-button" data-tab="scene3d">3D Web Scene</button>
         <button class="tab-button" data-tab="fiware">CSI vs FIWARE</button>
       </nav>
     </header>
@@ -239,7 +240,7 @@
       </div>
     </section>
 
-    <!-- ====== INTERACTIVE MAP TAB ====== -->
+    <!-- ====== INTERACTIVE 2D MAP TAB ====== -->
     <section class="tab-panel" data-tab-panel="interactive">
       <div class="card" id="height-map">
         <h2>Interactive Height Availability Map (Circoscrizione 7)</h2>
@@ -262,6 +263,30 @@
           class="map-frame"
           src="interactive/c7_height_map/index.html"
           title="Height availability map – Circoscrizione 7">
+        </iframe>
+      </div>
+    </section>
+
+    <!-- ====== 3D WEB SCENE TAB ====== -->
+    <section class="tab-panel" data-tab-panel="scene3d">
+      <div class="card">
+        <h2>Interactive 3D Scene (CSI Buildings)</h2>
+        <p class="note">
+          3D scene exported from QGIS (Qgis2threejs). Buildings in
+          <code>020101_UNITA_VOLUMETRICA</code> are extruded using CSI height
+          attributes (e.g. the derived <code>height_m</code> field).
+        </p>
+        <p class="note">
+          For a larger view you can open the scene in a separate tab:
+          <a href="interactive/c7_3d_scene/index.html" target="_blank">
+            Open 3D scene full screen
+          </a>
+        </p>
+
+        <iframe
+          class="map-frame"
+          src="interactive/c7_3d_scene/index.html"
+          title="3D CSI buildings – Qgis2threejs export">
         </iframe>
       </div>
     </section>
